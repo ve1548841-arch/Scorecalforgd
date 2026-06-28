@@ -1,0 +1,291 @@
+# GD Performance Index Calculator
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GD Performance Index</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@400;700&display=swap');
+
+        body {
+            background-color: #0a0a0c;
+            color: #ffffff;
+            font-family: 'Lexend+Exa', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+
+            overflow: hidden;
+        }
+
+        .gd-container {
+            background: linear-gradient(145deg, #161a1e, #0f1215);
+            border: 4px solid #232931;
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(46, 204, 113, 0.1);
+            position: relative;
+        }
+
+        .gd-container::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #2ecc71, #3498db, #f1c40f);
+
+            z-index: -1;
+            border-radius: 14px;
+            opacity: 0.3;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2ecc71;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #f8fafc;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #2ecc71;
+
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+        }
+
+        /* Calculate Button Style */
+        .calc-button {
+            width: 100%;
+            background: #2ecc71;
+            color: #0a0a0c;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            box-shadow: 0 4px 0 #27ae60;
+            margin-bottom: 1.5rem;
+
+        }
+
+        .calc-button:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #1e8449;
+        }
+
+        .calc-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 0 #1e8449;
+        }
+
+        .result-panel {
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1rem;
+
+            border: 1px dashed #334155;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #f1c40f;
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+        }
+
+        .rank {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .footer-note {
+            font-size: 0.65rem;
+            color: #475569;
+            text-align: center;
+            margin-top: 2rem;
+            line-height: 1.4;
+        }
+
+        .speed-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+
+
+        .icon {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .active-speed {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="gd-container">
+        <h1>Performance</h1>
+
+        <div class="speed-icons" id="speedIcons">
+            <div class="icon" data-val="0.5">0.5x</div>
+            <div class="icon active-speed" data-val="1.0">1.0x</div>
+            <div class="icon" data-val="2.0">2.0x</div>
+            <div class="icon" data-val="3.0">3.0x</div>
+            <div class="icon" data-val="4.0">4.0x</div>
+        </div>
+
+        <div class="input-group">
+            <label for="speed">Playback Speed Multiplier</label>
+            <input type="number" id="speed" value="1.0" step="0.05" min="0.1" placeholder="e.g. 1.25">
+        </div>
+
+        <div class="input-group">
+            <label for="collisions">Total Collisions (Deaths)</label>
+            <input type="number" id="collisions" value="0" min="0" placeholder="e.g. 5">
+
+        </div>
+
+        <button id="calculateBtn" class="calc-button">Calculate Your Score</button>
+
+        <div class="result-panel">
+            <div class="score-label">Skill Rating (PI)</div>
+            <div id="scoreValue" class="score-value">1000</div>
+            <div id="rankLabel" class="rank" style="color: #2ecc71;">Perfect Clear</div>
+        </div>
+
+        <p class="footer-note">
+            The Performance Index (PI) weights the 1.0x speed as base (1000 PI).<br>
+            Formula: (Speed<sup>1.5</sup> × 1000) / (1 + Collisions × 0.15)
+        </p>
+    </div>
+
+    <script>
+        const speedInput = document.getElementById('speed');
+        const collisionInput = document.getElementById('collisions');
+
+        const calculateBtn = document.getElementById('calculateBtn');
+        const scoreDisplay = document.getElementById('scoreValue');
+        const rankLabel = document.getElementById('rankLabel');
+        const icons = document.querySelectorAll('.icon');
+
+        function updateCalculator() {
+            const speed = parseFloat(speedInput.value) || 0.1;
+            const collisions = parseInt(collisionInput.value) || 0;
+
+            // Update UI Icons
+            icons.forEach(icon => {
+                if (parseFloat(icon.getAttribute('data-val')) === speed) {
+                    icon.classList.add('active-speed');
+                } else {
+                    icon.classList.remove('active-speed');
+                }
+            });
+
+            // Performance Index Formula
+
+            const basePI = 1000;
+            const speedFactor = Math.pow(speed, 1.5);
+            const penaltyFactor = 1 + (collisions * 0.15);
+            
+            let finalScore = Math.round((speedFactor * basePI) / penaltyFactor);
+            
+            scoreDisplay.innerText = finalScore.toLocaleString();
+
+            // Set Rank based on performance
+            if (collisions === 0 && speed >= 1.0) {
+                rankLabel.innerText = "Perfect Clear";
+                rankLabel.style.color = "#2ecc71";
+            } else if (finalScore > 2000) {
+                rankLabel.innerText = "Extreme Demon Pace";
+                rankLabel.style.color = "#e74c3c";
+            } else if (finalScore > 1000) {
+                rankLabel.innerText = "Master Runner";
+                rankLabel.style.color = "#3498db";
+            } else if (finalScore > 500) {
+
+                rankLabel.innerText = "Consistent Student";
+                rankLabel.style.color = "#f1c40f";
+            } else {
+                rankLabel.innerText = "Practice Required";
+                rankLabel.style.color = "#94a3b8";
+            }
+        }
+
+        // Run calculation on button click
+        calculateBtn.addEventListener('click', updateCalculator);
+
+        // Click icons to set speed (still triggers update for visual feedback)
+        icons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                speedInput.value = icon.getAttribute('data-val');
+                updateCalculator();
+            });
+        });
+
+
+        // Initialize with default values
+        updateCalculator();
+    </script>
+</body>
+</html>
+
+
